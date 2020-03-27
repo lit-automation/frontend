@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+        <meta name="description" content="Literature Study Automation">
+
+        <title>Lit Automation</title>
+
+        <!-- See https://goo.gl/OOhYW5 -->
+        <link rel="manifest" href="manifest.json">
+
+        <!-- See https://goo.gl/qRE0vM -->
+        <meta name="theme-color" content="#A7FFEB">
+
+        <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="application-name" content="Literature Study Automation">
+
+        <!-- Add to homescreen for Safari on iOS -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-title" content="Literature Study Automation">
+
+        <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/Icon-60@3x.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon.png">
+
+        <!-- Manifest for Windows -->
+        <meta name="msapplication-config" content="assets/icons/browserconfig.xml">
+
+        <!-- Default twitter cards -->
+        <meta name="twitter:card" content="Literature Study Automation">
+        <meta property="og:type" content="Literature Study Automation">
+        <meta property="og:site_name" content="Literature Study Automation">
+        <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Fira+Sans:400,500,700&display=swap" rel="stylesheet">
+        <meta property="og:image" content="assets/icons/GooglePlayStore.png" />
+
+        <style>
+            html {
+                font-size: 16px;
+            }
+
+            svg{
+                display: none;
+            }
+
+            body {
+                overflow: auto;
+                text-rendering: geometricPrecision;
+                -webkit-font-smoothing: antialiased;
+                -webkit-text-size-adjust: 100%;
+                -moz-osx-font-smoothing: grayscale;
+                margin: 0;
+                height: 100%;
+            }
+
+            .Loader {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('WebComponentsReady', function componentsReady() {
+                document.removeEventListener('WebComponentsReady', componentsReady, false);
+
+                var script = document.createElement('script');
+                script.async = true;
+                script.src = '/<%= htmlWebpackPlugin.files.chunks["main"].entry %>';
+
+                var refScript = document.body.getElementsByTagName('script')[0];
+                refScript.parentNode.insertBefore(script, refScript);
+            }, false);
+        </script>
+    </head>
+    <body>
+        <lit-app></lit-app>
+
+        <noscript>
+            Please enable Javascript to view anything on this website
+        </noscript>
+
+
+        <script defer src="<%= htmlWebpackPlugin.options.paths.webcomponents %>"></script>
+    </body>
+</html>

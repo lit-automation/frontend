@@ -1,0 +1,20 @@
+# Logs
+logs/
+*.log
+npm-debug.log*
+coverage/
+node_modules/
+.vscode/
+.idea/
+.npmrc
+.DS_Store
+src/vendor/webcomponents-loader.js
+*.report.html
+# To be sure...
+bower_components/
+analysis.json
+Makefile
+dist
+lit-frontend
+build
+bin
