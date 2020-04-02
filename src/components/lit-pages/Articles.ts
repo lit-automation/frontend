@@ -4,6 +4,55 @@ import { ProjArticle } from '../../async-reducers'
 import { getArticles, getProject } from '../../async-reducers'
 import '../../elements/Button';
 import { Button } from '../../elements/Button';
+import '../../elements/InputField';
+import '../../elements/Select';
+import { SelectOption } from '../../elements/Select';
+
+const articleTypeOptions: SelectOption[] = [
+    {
+        value: 'none',
+        text: 'None',
+    },
+    {
+        value: 'book-chapter',
+        text: 'Book',
+    },
+    {
+        value: 'journal-article',
+        text: 'Journal Article',
+    },
+    {
+        value: 'proceedings-article',
+        text: 'Conference Article',
+    },
+];
+
+const articleStatusOptions: SelectOption[] = [
+    {
+        value: 'none',
+        text: 'None',
+    },
+    {
+        value: "1",
+        text: 'Unprocessed',
+    },
+    {
+        value: '2',
+        text: 'Not Useful',
+    },
+    {
+        value: '3',
+        text: 'Useful',
+    },
+    {
+        value: '4',
+        text: 'Unknown',
+    },
+    {
+        value: '5',
+        text: 'Duplicate',
+    },
+];
 
 /**
  * Articles root component
@@ -83,7 +132,6 @@ export class Articles extends connect(window.store)(LitElement) {
             }
 
             .search-container {
-                border: 1px solid red;
                 height: 200px;
             }
 
@@ -97,6 +145,22 @@ export class Articles extends connect(window.store)(LitElement) {
                 margin-right: 0px;
                 margin-bottom: 0px;
             }
+
+            .row{
+                margin-top: 10px;
+                display: flex;
+                flex-direction: row;
+            }
+
+            .search-elem-wrapper{
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+
+            .label {
+                font-weight: bold;
+            }
+
         `;
     }
 
@@ -123,10 +187,75 @@ export class Articles extends connect(window.store)(LitElement) {
 
     private lastID: string = ''
 
+    @property({ type: Object })
+    private articleSearchTimeout?: NodeJS.Timer;
+
+    public articleType?: string;
+
+    public articleStatus?: string;
+
+    @query('#title')
+    private titleElem?: HTMLInputElement;
+
+    @query('#doi')
+    private doiElem?: HTMLInputElement;
+
+    @query('#abstract')
+    private abstractElem?: HTMLInputElement;
+
+    @query('#year')
+    private yearElem?: HTMLInputElement;
+
+    @query('#cites')
+    private citesElem?: HTMLInputElement;
+
     public render = (): TemplateResult => html`
     <div class="content-container">
     <div class="search-container">
-    TODO search interface
+        <div class="header">
+        Use the fields below to search through your articles
+        </div>
+        <div class="row">
+            <div class="search-elem-wrapper">
+                <div class="label">Title</div>
+                <lit-input-field class="search-item" id="title" placeholder="Title" @keyup="${this.search}"></lit-input-field>
+            </div>
+            <div class="search-elem-wrapper">
+                <div class="label">DOI</div>
+                <lit-input-field class="search-item" id="doi" placeholder="DOI" @keyup="${this.search}"></lit-input-field>
+            </div>
+            <div class="search-elem-wrapper">
+                <div class="label">Abstract</div>
+                <lit-input-field class="search-item" id="abstract" placeholder="Abstract" @keyup="${this.search}"></lit-input-field>
+            </div>
+            <div class="search-elem-wrapper">
+                <div class="label">Min Year</div>
+                <lit-input-field class="search-item" id="year" placeholder="Minimum Year" type="number" @keyup="${this.search}"></lit-input-field>
+            </div>
+     
+        </div>
+        <div class="row">
+            <div class="search-elem-wrapper">
+                <div class="label">Min Cites</div>
+                <lit-input-field class="search-item" id="cites" placeholder="Minimum Amount of cites" @keyup="${this.search}"></lit-input-field>
+            </div>
+            <div class="search-elem-wrapper">
+                <div class="label">Article type</div>
+                <lit-select
+                        placeholder="Article type"
+                        eventName="type-changed"
+                        .options="${articleTypeOptions}"
+                ></lit-select>
+            </div>
+            <div class="search-elem-wrapper">
+                <div class="label">Article status</div>
+                <lit-select
+                        placeholder="Article status"
+                        eventName="status-changed"
+                        .options="${articleStatusOptions}"
+                ></lit-select>
+            </div>
+        </div>
     </div>
     <div class="project-header-row">
                 <div class="large column header">
@@ -168,6 +297,9 @@ export class Articles extends connect(window.store)(LitElement) {
 
     constructor() {
         super();
+        document.addEventListener('type-changed', this.selectedTypeChanged);
+        document.addEventListener('status-changed', this.selectedStatusChanged);
+
     }
 
     private renderArticles() {
@@ -202,7 +334,7 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.projectID) {
             return;
         }
-        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1));
+        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, ''));
     }
 
     private prev = (): void => {
@@ -213,7 +345,7 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.projectID) {
             return;
         }
-        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1));
+        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, ''));
 
     }
 
@@ -287,8 +419,75 @@ export class Articles extends connect(window.store)(LitElement) {
             window.store.dispatch(getProject.run(''));
         } else if (this.projectID != this.lastID) {
             this.lastID = this.projectID
-            window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1));
+            window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, ''));
         }
+    }
+
+    private selectedTypeChanged = (e: any): void => {
+        if (e.detail.value === 'none') {
+            this.articleType = undefined
+        } else {
+            this.articleType = e.detail.value
+        }
+        this.search()
+    }
+
+    private selectedStatusChanged = (e: any): void => {
+        if (e.detail.value === 'none') {
+            this.articleStatus = undefined
+        } else {
+            this.articleStatus = e.detail.value
+        }
+        this.search()
+    }
+
+    private search() {
+        if (!this.titleElem) {
+            return
+        }
+       
+        if (this.articleSearchTimeout !== undefined) {
+            clearTimeout(this.articleSearchTimeout);
+        }
+
+        this.articleSearchTimeout = setTimeout(() => {
+            let params = []
+            if (this.titleElem) {
+                if (this.titleElem.value) {
+                    params.push("title=" + this.titleElem.value)
+                }
+            }
+            if (this.doiElem) {
+                if (this.doiElem.value) {
+                    params.push("doi=" + this.doiElem.value)
+                }
+            }
+            if (this.yearElem) {
+                if (this.yearElem.value) {
+                    params.push("year=" + this.yearElem.value)
+                }
+            }
+            if (this.abstractElem) {
+                if (this.abstractElem.value) {
+                    params.push("abstract=" + this.abstractElem.value)
+                }
+            }
+            if (this.citesElem) {
+                if (this.citesElem.value) {
+                    params.push("amount_cited=" + this.citesElem.value)
+                }
+            }
+            if (this.articleType) {
+                params.push("type=" + this.articleType)
+            }
+            if (this.articleStatus) {
+                params.push("status=" + this.articleStatus)
+            }
+            if(!this.projectID){
+                return
+            }
+            window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, params.join("&")));
+        }, 200)
     }
 
 }

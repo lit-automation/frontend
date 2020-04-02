@@ -5,8 +5,8 @@ export const getArticles = new ReduxAsync(
     'Project: REQUEST_GET_ARTICLES',
     'Project: REQUEST_GET_ARTICLES_SUCCES',
     'Project: REQUEST_GET_ARTICLES_FAILURE',
-    async (projectID: string, page: number): Promise<Object> => {
-        return (await listArticlesForProject(projectID, page));
+    async (projectID: string, page: number, params: string): Promise<Object> => {
+        return (await listArticlesForProject(projectID, page, params));
     },
 );
 
@@ -23,18 +23,18 @@ declare global {
     }
 }
 
-let listArticlesForProject = async function (projectID: string, page: number) {
+let listArticlesForProject = async function (projectID: string, page: number, params: string) {
     let data = {}
 
     let headers = window.STDHeaders
     let jwt = localStorage.getItem('jwt')
-    if (!jwt){
+    if (!jwt) {
         console.warn("JWT NOT SET")
         return data
     }
     headers.set('Authorization', jwt)
     headers.set("X-List-Page", String(page))
-    let response = await fetch(window.API_LINK + '/project/' + projectID+'/article/list', {
+    let response = await fetch(window.API_LINK + '/project/' + projectID + '/article/list?' + params, {
         method: 'GET',
         mode: 'cors', // no-cors, *cors, same-origin
         cache: 'no-cache',
