@@ -69,7 +69,6 @@ export class ArticleEdit extends LitElement {
     }
 
     public render = (): TemplateResult => {
-        console.log("RENDER",this.curEdit)
         if (!this.curEdit) {
             return html``
         }
@@ -168,17 +167,11 @@ export class ArticleEdit extends LitElement {
     }
 
     private edit = (): void => {
-        console.log("this cur edit",this.curEdit)
         if (!this.curEdit) {
             return
         }
-        // let temp = JSON.stringify(this.curEdit);
-        // let temp2 = JSON.parse(temp)
-        // console.log("TEMP@",temp2)
         if (this.titleElem && this.titleElem.value) {
-            console.log("Hmm",this.titleElem.value)
             this.curEdit.title = this.titleElem.value
-            console.log("HIII",this.curEdit.title)
         }
         if (this.abstractElem && this.abstractElem.value) {
             this.curEdit.abstract = this.abstractElem.value
@@ -214,7 +207,6 @@ export class ArticleEdit extends LitElement {
         if (this.commentElem && this.commentElem.value) {
             this.curEdit.comment = this.commentElem.value
         }
-        console.log("this cur edit",this.curEdit)
 
         fetch(window.API_LINK + "/project/"+this.projectID+"/article/"+this.curEdit.id, {
             method: 'PUT',
@@ -243,9 +235,6 @@ export class ArticleEdit extends LitElement {
                 document.dispatchEvent(event);
             }
         })
-
-
-        console.log("CUR EDIT", this.curEdit)
     }
 }
 
