@@ -1,58 +1,15 @@
 import { css, CSSResult, property, customElement, html, query, TemplateResult, PropertyValues, LitElement } from 'lit-element';
 import { connect, watch } from 'lit-redux-watch';
-import { ProjArticle } from '../../async-reducers'
+import { ProjArticle, ArticleTypeOptions, ArticleStatusOptions } from '../../async-reducers'
 import { getArticles, getProject } from '../../async-reducers'
 import '../../elements/Button';
 import { Button } from '../../elements/Button';
+import { Popup } from '../../elements/Popup';
+
 import '../../elements/InputField';
+import '../../elements/Popup';
 import '../../elements/Select';
-import { SelectOption } from '../../elements/Select';
-
-const articleTypeOptions: SelectOption[] = [
-    {
-        value: 'none',
-        text: 'None',
-    },
-    {
-        value: 'book-chapter',
-        text: 'Book',
-    },
-    {
-        value: 'journal-article',
-        text: 'Journal Article',
-    },
-    {
-        value: 'proceedings-article',
-        text: 'Conference Article',
-    },
-];
-
-const articleStatusOptions: SelectOption[] = [
-    {
-        value: 'none',
-        text: 'None',
-    },
-    {
-        value: "1",
-        text: 'Unprocessed',
-    },
-    {
-        value: '2',
-        text: 'Not Useful',
-    },
-    {
-        value: '3',
-        text: 'Useful',
-    },
-    {
-        value: '4',
-        text: 'Unknown',
-    },
-    {
-        value: '5',
-        text: 'Duplicate',
-    },
-];
+import './ArticleEdit';
 
 /**
  * Articles root component
@@ -161,6 +118,14 @@ export class Articles extends connect(window.store)(LitElement) {
                 font-weight: bold;
             }
 
+            .edit-button{
+                cursor: pointer;
+            }
+
+            #globe{
+                margin-left: 10px;
+            }
+
         `;
     }
 
@@ -175,6 +140,7 @@ export class Articles extends connect(window.store)(LitElement) {
 
     private curPage: number = 1;
     private minPage: number = 1;
+
     @property({ type: Number, reflect: true })
     private maxPage: number = 1;
     private perPage: number = 20;
@@ -209,7 +175,20 @@ export class Articles extends connect(window.store)(LitElement) {
     @query('#cites')
     private citesElem?: HTMLInputElement;
 
+    public params: string = "";
+
+    @query('#popup')
+    private popupElem?: Popup;
+
+    @property({ type: Object, reflect: true })
+    private curEdit?: ProjArticle;
+
     public render = (): TemplateResult => html`
+    <lit-popup id="popup" >
+        <div>
+        ${this.renderEdit()}
+        </div>
+    </lit-popup>
     <div class="content-container">
     <div class="search-container">
         <div class="header">
@@ -232,7 +211,6 @@ export class Articles extends connect(window.store)(LitElement) {
                 <div class="label">Min Year</div>
                 <lit-input-field class="search-item" id="year" placeholder="Minimum Year" type="number" @keyup="${this.search}"></lit-input-field>
             </div>
-     
         </div>
         <div class="row">
             <div class="search-elem-wrapper">
@@ -244,7 +222,7 @@ export class Articles extends connect(window.store)(LitElement) {
                 <lit-select
                         placeholder="Article type"
                         eventName="type-changed"
-                        .options="${articleTypeOptions}"
+                        .options="${ArticleTypeOptions}"
                 ></lit-select>
             </div>
             <div class="search-elem-wrapper">
@@ -252,10 +230,13 @@ export class Articles extends connect(window.store)(LitElement) {
                 <lit-select
                         placeholder="Article status"
                         eventName="status-changed"
-                        .options="${articleStatusOptions}"
+                        .options="${ArticleStatusOptions}"
                 ></lit-select>
             </div>
         </div>
+    </div>
+    <div class="row label">
+    Displaying: ${this.amountOfArticles} articles
     </div>
     <div class="project-header-row">
                 <div class="large column header">
@@ -264,7 +245,7 @@ export class Articles extends connect(window.store)(LitElement) {
                 <div class="column header">
                     Cited
                 </div>
-                <div class="column medium header">
+                <div class="column header">
                     DOI
                 </div>
                 <div class="column header">
@@ -272,6 +253,9 @@ export class Articles extends connect(window.store)(LitElement) {
                 </div>
                 <div class="column header">
                     Authors
+                </div>
+                <div class="column header">
+                    Edit
                 </div>
             </div>
             <div class="articles-list-wrapper">
@@ -299,25 +283,66 @@ export class Articles extends connect(window.store)(LitElement) {
         super();
         document.addEventListener('type-changed', this.selectedTypeChanged);
         document.addEventListener('status-changed', this.selectedStatusChanged);
+        document.addEventListener('article-editted', this.articleUpdated);
 
+    }
+
+    private renderEdit() {
+        if (!this.curEdit) {
+            return html``
+        }
+        return html`
+            <lit-article-edit .projectID=${this.projectID} .curEdit=${this.curEdit}></lit-article-edit>
+        `
     }
 
     private renderArticles() {
         if (!this.articles) {
             return html``
         }
-
         return this.articles.map((item) => html`
             <div class="project-row">
                 <div class="column large">${item.title}</div>
                 <div class="column">${this.citedToString(item.cited_amount)}</div>
-                <div class="column medium">${item.doi}</div>
+                <div class="column">${item.doi}</div>
                 <div class="column">${item.journal}</div>
                 <div class="column">${item.authors}</div>
+                <img class="edit-button" src="assets/icons/edit.svg" @click="${(): void => {
+                this.articleDetails(item)
+            }}"/>
+            <img class="edit-button" id="globe" src="assets/icons/globe.svg" @click="${(): void => {
+                this.goToHref(item)
+            }}"/>
             </div>
             `)
     }
 
+    private articleDetails(item: ProjArticle) {
+        this.curEdit = item;
+        if (this.popupElem) {
+            this.popupElem.showPopup = true;
+        }
+    }
+
+    private goToHref = (item: ProjArticle) => {
+        if (!item.url || item.url == '') {
+            window.open('https://scholar.google.com/scholar?q=' + encodeURI(item.title) + '&hl=en&as_sdt=0,5')
+        } else {
+            window.open(item.url, '_blank');
+        }
+    }
+
+    private articleUpdated = (): void => {
+        if (this.popupElem) {
+            this.popupElem.showPopup = false;
+        }
+        if (!this.projectID) {
+            return;
+        }
+        this.curEdit = undefined
+
+        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, this.params));
+    }
 
     private citedToString = (cited: number): string => {
         if (cited === -1) {
@@ -334,7 +359,7 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.projectID) {
             return;
         }
-        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, ''));
+        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, this.params));
     }
 
     private prev = (): void => {
@@ -345,7 +370,7 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.projectID) {
             return;
         }
-        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, ''));
+        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, this.params));
 
     }
 
@@ -419,7 +444,7 @@ export class Articles extends connect(window.store)(LitElement) {
             window.store.dispatch(getProject.run(''));
         } else if (this.projectID != this.lastID) {
             this.lastID = this.projectID
-            window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, ''));
+            window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, this.params));
         }
     }
 
@@ -445,7 +470,7 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.titleElem) {
             return
         }
-       
+
         if (this.articleSearchTimeout !== undefined) {
             clearTimeout(this.articleSearchTimeout);
         }
@@ -483,10 +508,12 @@ export class Articles extends connect(window.store)(LitElement) {
             if (this.articleStatus) {
                 params.push("status=" + this.articleStatus)
             }
-            if(!this.projectID){
+            if (!this.projectID) {
                 return
             }
-            window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, params.join("&")));
+            this.params = params.join("&")
+            this.curPage = 1;
+            window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, this.params));
         }, 200)
     }
 

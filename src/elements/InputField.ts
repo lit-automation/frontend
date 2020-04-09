@@ -294,7 +294,7 @@ export class InputField extends LitElement {
     @property({ type: Boolean })
     public active: boolean = false;
 
-    @property({ type: String })
+    @property({ type: String, reflect: true })
     public value: string = '';
 
     @property({ type: Boolean })
@@ -458,7 +458,6 @@ export class InputField extends LitElement {
     }
 
     protected firstUpdated = (): void => {
-
         this.inputType = this.type;
     }
 

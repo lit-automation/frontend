@@ -1,3 +1,4 @@
+import { SelectOption } from '../elements/Select';
 
 export type Project = {
   id: string,
@@ -27,7 +28,48 @@ export type ProjArticle = {
   status: number
   title: string
   url: string
+  type: string
   year: number
 }
 
+export const ArticleTypeOptions: SelectOption[] = [
+  {
+      value: 'none',
+      text: 'None',
+  },
+  {
+      value: 'book-chapter',
+      text: 'Book',
+  },
+  {
+      value: 'journal-article',
+      text: 'Journal Article',
+  },
+  {
+      value: 'proceedings-article',
+      text: 'Conference Article',
+  },
+];
 
+export const ArticleStatusOptions: SelectOption[] = [
+  {
+      value: "1",
+      text: 'Unprocessed',
+  },
+  {
+      value: '2',
+      text: 'Not Useful',
+  },
+  {
+      value: '3',
+      text: 'Useful',
+  },
+  {
+      value: '4',
+      text: 'Unknown',
+  },
+  {
+      value: '5',
+      text: 'Duplicate',
+  },
+];

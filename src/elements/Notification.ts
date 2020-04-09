@@ -8,6 +8,7 @@ export class Notification extends LitElement {
     static get styles(): CSSResult {
         return css`
             :host {
+                z-index: 999999999999;
                 width: 100%;
                 position: absolute;
                 color: var(--primary-white);
