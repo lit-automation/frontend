@@ -4,7 +4,7 @@ import { init } from '@weavedev/store/init';
 import { appMiddleware } from './middleware';
 import { initReselect } from './reselect';
 
-window.DEV_MODE = true;
+window.DEV_MODE = false;
 init(appMiddleware);
 
 // Setup reselect

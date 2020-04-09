@@ -339,9 +339,13 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.projectID) {
             return;
         }
+        if(!this.curEdit){
+            return;
+        }
         this.curEdit = undefined
-
+      
         window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, this.params));
+
     }
 
     private citedToString = (cited: number): string => {
@@ -439,7 +443,7 @@ export class Articles extends connect(window.store)(LitElement) {
     }
 
 
-    protected retrieveInfo() {
+    protected retrieveInfo = (): void =>{
         if (!this.projectID) {
             window.store.dispatch(getProject.run(''));
         } else if (this.projectID != this.lastID) {
