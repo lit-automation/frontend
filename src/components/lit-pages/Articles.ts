@@ -5,6 +5,7 @@ import { getArticles, getProject } from '../../async-reducers'
 import '../../elements/Button';
 import { Button } from '../../elements/Button';
 import { Popup } from '../../elements/Popup';
+import { showNotification } from '../../elements/Notification';
 
 import '../../elements/InputField';
 import '../../elements/Popup';
@@ -52,6 +53,7 @@ export class Articles extends connect(window.store)(LitElement) {
             }
 
             .project-row {
+                border-top: 2px solid var(--primary-grey-20);
                 margin-top: 5px;
                 display:flex;
                 flex-direction:row;
@@ -105,6 +107,7 @@ export class Articles extends connect(window.store)(LitElement) {
 
             .row{
                 margin-top: 10px;
+                margin-bottom: 5px;
                 display: flex;
                 flex-direction: row;
             }
@@ -116,6 +119,7 @@ export class Articles extends connect(window.store)(LitElement) {
 
             .label {
                 font-weight: bold;
+                min-width: 50px;
             }
 
             .edit-button{
@@ -124,6 +128,10 @@ export class Articles extends connect(window.store)(LitElement) {
 
             #globe{
                 margin-left: 10px;
+            }
+
+            #addWrapper{
+                padding: 25px;
             }
 
         `;
@@ -175,20 +183,47 @@ export class Articles extends connect(window.store)(LitElement) {
     @query('#cites')
     private citesElem?: HTMLInputElement;
 
+    @query('#addTitle')
+    private addTitleElem?: HTMLInputElement;
+
+    @query('#addDOI')
+    private addDOIElem?: HTMLInputElement;
+
     public params: string = "";
 
-    @query('#popup')
+    @query('#editPopup')
     private popupElem?: Popup;
+
+    @query('#addPopup')
+    private addElem?: Popup;
 
     @property({ type: Object, reflect: true })
     private curEdit?: ProjArticle;
 
     public render = (): TemplateResult => html`
-    <lit-popup id="popup" >
+    <lit-popup id="editPopup" >
         <div>
         ${this.renderEdit()}
         </div>
     </lit-popup>
+
+
+    <lit-popup id="addPopup" >
+        <div id="addWrapper">
+            <div class="row">
+                <div class="label">title</div>
+                <lit-input-field class="search-item" id="addTitle" placeholder="Title"></lit-input-field>
+            </div>
+            <div class="row">
+                <div class="label">DOI</div>
+                <lit-input-field class="search-item" id="addDOI" name="doi" placeholder="DOI"></lit-input-field>
+            </div>
+             <lit-button @click="${(): void => {
+                this.addArticle()
+            }}">Add Article</lit-button>
+        </div>
+    </lit-popup>
+
     <div class="content-container">
     <div class="search-container">
         <div class="header">
@@ -235,8 +270,12 @@ export class Articles extends connect(window.store)(LitElement) {
             </div>
         </div>
     </div>
-    <div class="row label">
-    Displaying: ${this.amountOfArticles} articles
+    <div class="row">
+        <lit-button @click="${(): void => {
+            this.addArticlePopup()
+        }}">Add Article</lit-button>
+        <div class="grow"></div>
+        <div class="label">Displaying: ${this.amountOfArticles} articles</div>
     </div>
     <div class="project-header-row">
                 <div class="large column header">
@@ -324,6 +363,58 @@ export class Articles extends connect(window.store)(LitElement) {
         }
     }
 
+    private addArticlePopup(){
+        if (this.addElem) {
+            this.addElem.showPopup = true;
+        }
+    }
+
+    private addArticle(){
+        let res = {
+            title: "",
+            doi: "",
+        }
+        if (this.addTitleElem && this.addTitleElem.value) {
+            res.title = this.addTitleElem.value
+        }
+        if (this.addDOIElem && this.addDOIElem.value) {
+            res.doi = this.addDOIElem.value
+        }
+
+        if(res.title === "" && res.doi === ""){
+            showNotification("Atleast title or DOI need to be filled in.")
+        }
+        fetch(window.API_LINK + "/project/"+this.projectID+"/article", {
+            method: 'POST',
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache',
+            headers: window.STDHeaders,
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+            body: JSON.stringify(res),
+        }).then(async (resp) => {
+            if (resp.status !== 200) {
+                const response = await resp.json()
+                if (response.detail) {
+                    showNotification(response.detail)
+                } else {
+                    showNotification("Unable to add article")
+                }
+            } else {
+                showNotification('Successfully added article')
+                if (this.addTitleElem){
+                    this.addTitleElem.value = ""
+                }
+                if (this.addDOIElem){
+                    this.addDOIElem.value = ""
+                }
+                if (this.addElem) {
+                    this.addElem.showPopup = false;
+                }
+            }
+        })
+    }
+
     private goToHref = (item: ProjArticle) => {
         if (!item.url || item.url == '') {
             window.open('https://scholar.google.com/scholar?q=' + encodeURI(item.title) + '&hl=en&as_sdt=0,5')
@@ -392,7 +483,7 @@ export class Articles extends connect(window.store)(LitElement) {
             var url = window.URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
-            a.download = "filename.csv";
+            a.download = "article-export.csv";
             document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
             a.click();
             a.remove();

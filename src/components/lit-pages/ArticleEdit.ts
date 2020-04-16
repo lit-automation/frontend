@@ -222,7 +222,7 @@ export class ArticleEdit extends LitElement {
                 if (response.detail) {
                     showNotification(response.detail)
                 } else {
-                    showNotification("Unable to create user")
+                    showNotification("Unable to edit article")
                 }
             } else {
                 showNotification('Successfully updated article')

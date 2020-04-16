@@ -148,7 +148,7 @@ export class Graph extends connect(window.store)(LitElement) {
                 </div>
                 <div class="wrapper">
                     <div class="property">URL:</div>
-                    <a id="url" ></a>
+                    <a id="url" target="_blank" ></a>
                 </div>
                 <div class="wrapper">
                     <div id="discover"></div>
