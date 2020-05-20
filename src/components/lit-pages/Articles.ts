@@ -11,6 +11,7 @@ import '../../elements/InputField';
 import '../../elements/Popup';
 import '../../elements/Select';
 import './ArticleEdit';
+import './ArticleScreen';
 
 /**
  * Articles root component
@@ -124,13 +125,13 @@ export class Articles extends connect(window.store)(LitElement) {
 
             .edit-button{
                 cursor: pointer;
-            }
-
-            #globe{
+                width: 24px;
+                height: auto;
                 margin-left: 10px;
+
             }
 
-            #addWrapper{
+            .addWrapper{
                 padding: 25px;
             }
 
@@ -197,6 +198,9 @@ export class Articles extends connect(window.store)(LitElement) {
     @query('#addPopup')
     private addElem?: Popup;
 
+    @query('#screenPopup')
+    private screenElem?: Popup;
+
     @property({ type: Object, reflect: true })
     private curEdit?: ProjArticle;
 
@@ -207,9 +211,14 @@ export class Articles extends connect(window.store)(LitElement) {
         </div>
     </lit-popup>
 
+    <lit-popup id="screenPopup" >
+    <div>
+        ${this.renderScreen()}
+    </div>
+    </lit-popup>
 
     <lit-popup id="addPopup" >
-        <div id="addWrapper">
+        <div class="addWrapper">
             <div class="row">
                 <div class="label">title</div>
                 <lit-input-field class="search-item" id="addTitle" placeholder="Title"></lit-input-field>
@@ -323,6 +332,8 @@ export class Articles extends connect(window.store)(LitElement) {
         document.addEventListener('type-changed', this.selectedTypeChanged);
         document.addEventListener('status-changed', this.selectedStatusChanged);
         document.addEventListener('article-editted', this.articleUpdated);
+        document.addEventListener('article-screened', this.articleScreened);
+        
 
     }
 
@@ -335,11 +346,21 @@ export class Articles extends connect(window.store)(LitElement) {
         `
     }
 
+    private renderScreen() {
+        if (!this.curEdit) {
+            return html``
+        }
+        console.log("EDIT CHANGED",this.curEdit)
+        return html`
+            <lit-screen .projectID=${this.projectID} .curEdit=${this.curEdit}></lit-screen>
+        `
+    }
+
     private renderArticles() {
         if (!this.articles) {
             return html``
         }
-        return this.articles.map((item) => html`
+        return this.articles.map((item): TemplateResult => {return html`
             <div class="project-row">
                 <div class="column large">${item.title}</div>
                 <div class="column">${this.citedToString(item.cited_amount)}</div>
@@ -349,11 +370,14 @@ export class Articles extends connect(window.store)(LitElement) {
                 <img class="edit-button" src="assets/icons/edit.svg" @click="${(): void => {
                 this.articleDetails(item)
             }}"/>
+            <img class="edit-button" src="assets/icons/screen.svg" @click="${(): void => {
+                this.screenArticlePopup(item)
+            }}"/>
             <img class="edit-button" id="globe" src="assets/icons/globe.svg" @click="${(): void => {
                 this.goToHref(item)
             }}"/>
             </div>
-            `)
+            `})
     }
 
     private articleDetails(item: ProjArticle) {
@@ -366,6 +390,13 @@ export class Articles extends connect(window.store)(LitElement) {
     private addArticlePopup(){
         if (this.addElem) {
             this.addElem.showPopup = true;
+        }
+    }
+
+    private screenArticlePopup(item: ProjArticle){
+        this.curEdit = item;
+        if(this.screenElem){
+            this.screenElem.showPopup = true;
         }
     }
 
@@ -421,6 +452,22 @@ export class Articles extends connect(window.store)(LitElement) {
         } else {
             window.open(item.url, '_blank');
         }
+    }
+
+    private articleScreened = (): void => {
+        if (this.popupElem) {
+            this.popupElem.showPopup = false;
+        }
+        if (!this.projectID) {
+            return;
+        }
+        if(!this.curEdit){
+            return;
+        }
+        this.curEdit = undefined
+      
+        window.store.dispatch(getArticles.run(this.projectID, this.curPage - 1, this.params));
+
     }
 
     private articleUpdated = (): void => {
