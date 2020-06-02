@@ -455,8 +455,8 @@ export class Articles extends connect(window.store)(LitElement) {
     }
 
     private articleScreened = (): void => {
-        if (this.popupElem) {
-            this.popupElem.showPopup = false;
+        if (this.screenElem) {
+            this.screenElem.showPopup = false;
         }
         if (!this.projectID) {
             return;

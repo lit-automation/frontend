@@ -46,6 +46,14 @@ export class ArticleScreen extends LitElement {
             lit-button{
                 height: 52px;
             }
+
+            #include{
+                background-color: green;
+            }
+
+            #exclude{
+                background-color: red;
+            }
         `;
     }
 
@@ -89,10 +97,10 @@ export class ArticleScreen extends LitElement {
             ${this.renderSentences(this.artSentences)}
         </div>
         <div class="row">
-        <lit-button id="edit" @click="${(): void => {
+        <lit-button id="include" @click="${(): void => {
                 this.include()
             }}">Include</lit-button>
-            <lit-button id="edit" @click="${(): void => {
+            <lit-button id="exclude" @click="${(): void => {
                 this.exclude()
             }}">Exclude</lit-button>
         </div>
