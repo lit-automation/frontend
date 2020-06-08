@@ -1,9 +1,9 @@
-import { css, CSSResult, customElement, query, html, TemplateResult, PropertyValues, LitElement } from 'lit-element';
+import { css, CSSResult, customElement, html, LitElement, PropertyValues, query, TemplateResult } from 'lit-element';
 import { connect } from 'lit-redux-watch';
+import { getProject } from '../../async-reducers';
 import '../../elements/Button';
 import '../../elements/InputField';
 import { showNotification } from '../../elements/Notification';
-import { getProject } from '../../async-reducers'
 
 /**
  * Import root component
@@ -32,7 +32,7 @@ export class Import extends connect(window.store)(LitElement) {
                 display:flex;
                 direction: row;
             }
-            
+
             .input-wrapper{
                 width: 300px;
                 display:flex;
@@ -73,7 +73,7 @@ export class Import extends connect(window.store)(LitElement) {
                 margin-top: 10px;
             }
 
-            
+
         `;
     }
 
@@ -82,6 +82,10 @@ export class Import extends connect(window.store)(LitElement) {
 
     @query('#file')
     public fileContent?: any;
+
+    constructor() {
+        super();
+    }
 
     public render = (): TemplateResult => html`
     <div class="content-container">
@@ -94,8 +98,8 @@ export class Import extends connect(window.store)(LitElement) {
                 <label id=file-label" class="import-elem" for="file"><lit-button id="upload-button">Choose A file</lit-button></label>
 
                 <lit-button class="import-elem" id="submit-button" @click="${(): void => {
-            this.createProject()
-        }}">Import project</lit-button>
+                    this.createProject();
+                }}">Import project</lit-button>
         </div>
         <div class="explanation">
         <div class="header">
@@ -104,17 +108,13 @@ export class Import extends connect(window.store)(LitElement) {
         <div class="exp-text">
         Use this form to create a project from an existing CSV file.
         The first row of your CSV should be indicating the column headers.
-        Valid headers are: "title" & "year".
+        Valid headers are: "title","abstract","doi","url" & "year".
         </div>
         </div>
        </div>
         <div>
         </div>
-    </div>`;
-
-    constructor() {
-        super();
-    }
+    </div>`
 
     protected readonly firstUpdated = (changedProperties: PropertyValues): any => {
         super.firstUpdated(changedProperties);
@@ -122,28 +122,28 @@ export class Import extends connect(window.store)(LitElement) {
 
     private createProject = (): void => {
         if (!this.projectName?.value) {
-            showNotification("No project name provided")
-            return
+            showNotification('No project name provided');
+            return;
         }
         if (!this.fileContent?.value) {
-            showNotification("No CSV file provided")
-            return
+            showNotification('No CSV file provided');
+            return;
         }
-        let fr = new FileReader();
-        fr.readAsText(this.fileContent.files[0])
+        const fr = new FileReader();
+        fr.readAsText(this.fileContent.files[0]);
         fr.onload = (evt) => {
             this.createProjectAPI({
-                "csv_content": evt.target?.result,
-                "name": this.projectName?.value,
-            })
-        }
+                csv_content: evt.target?.result,
+                name: this.projectName?.value,
+            });
+        };
         fr.onerror = (evt) => {
-            console.log("Can't read file", evt)
-        }
+            console.log('Can\'t read file', evt);
+        };
     }
 
     private createProjectAPI = (payload: Object): void => {
-        fetch(window.API_LINK + "/project/csv", {
+        fetch(window.API_LINK + '/project/csv', {
             method: 'POST',
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache',
@@ -153,27 +153,26 @@ export class Import extends connect(window.store)(LitElement) {
             body: JSON.stringify(payload),
         }).then(async (resp) => {
             if (resp.status !== 200) {
-                const response = await resp.json()
+                const response = await resp.json();
                 if (response.detail) {
-                    showNotification(response.detail)
+                    showNotification(response.detail);
                 } else {
-                    showNotification("Unable to create project from CSV")
+                    showNotification('Unable to create project from CSV');
                 }
             } else {
-                const response = await resp.json()
+                const response = await resp.json();
                 window.store.dispatch(getProject.run(response.id));
 
-                showNotification("Project created successfully")
+                showNotification('Project created successfully');
                 if (this.projectName) {
-                    this.projectName.value = ''
+                    this.projectName.value = '';
                 }
                 if (this.fileContent) {
-                    this.fileContent.value = ''
+                    this.fileContent.value = '';
                 }
             }
-        })
+        });
     }
-
 }
 
 declare global {
