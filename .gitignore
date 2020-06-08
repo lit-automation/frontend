@@ -13,8 +13,9 @@ src/vendor/webcomponents-loader.js
 # To be sure...
 bower_components/
 analysis.json
-Makefile
 dist
 lit-frontend
 build
 bin
+frontend
+scripts
