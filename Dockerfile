@@ -14,6 +14,6 @@ RUN apk --no-cache add ca-certificates tzdata && update-ca-certificates
 COPY --from=nodebuilder /app/dist /dist
 COPY --from=builder /app/bin/main /
 RUN ls
-EXPOSE 9002
+EXPOSE 8000
 STOPSIGNAL SIGTERM
 CMD ["./main"]

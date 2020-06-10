@@ -8,8 +8,15 @@ Visit [lit.wimsp.nl](https://lit.wimsp.nl/) to use the dashboard.
 
 # Running Locally
 
-1. Execute: `npm run dev`
-2. Open your browser at [http://localhost:8081](http://localhost:8081)
+1. Execute: `npm install`
+2. Execute `make run`
+3. Open your browser at [http://localhost:8081](http://localhost:8081)
+
+# Docker
+
+1. Build using `make docker-build`
+2. Running the image: `docker run -p <your-exposing-port>:8000 slr-frontend`
+
 
 # Contributions
 
