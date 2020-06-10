@@ -1,5 +1,5 @@
-import { css, CSSResult, query, property, customElement, html, LitElement, TemplateResult } from 'lit-element';
-import { ProjArticle, ArticleTypeOptions, ArticleStatusOptions } from '../../async-reducers'
+import { css, CSSResult, customElement, html, LitElement, property, query, TemplateResult } from 'lit-element';
+import { ArticleStatusOptions, ArticleTypeOptions, ProjArticle } from '../../async-reducers';
 import { showNotification } from '../../elements/Notification';
 
 /**
@@ -13,6 +13,7 @@ export class ArticleEdit extends LitElement {
                 padding-top: 25px;
                 padding-bottom: 25px;
                 display: block;
+                min-width: 800px;
                 margin-left: 40px;
                 margin-right: 40px;
             }
@@ -70,13 +71,13 @@ export class ArticleEdit extends LitElement {
 
     public render = (): TemplateResult => {
         if (!this.curEdit) {
-            return html``
+            return html``;
         }
-        let temp = JSON.stringify(this.curEdit);
+        const temp = JSON.stringify(this.curEdit);
         this.curEdit = undefined;
         this.curEdit = JSON.parse(temp);
         if (!this.curEdit) {
-            return html``
+            return html``;
         }
         return html`
             <div class="row">
@@ -138,7 +139,7 @@ export class ArticleEdit extends LitElement {
             </div>
            <div class="row">
             <lit-button id="edit" @click="${(): void => {
-                this.edit()
+                this.edit();
             }}">Edit</lit-button>
             </div>
         `;
@@ -146,69 +147,68 @@ export class ArticleEdit extends LitElement {
 
     private selectedTypeChanged = (e: any): void => {
         if (!this.curEdit) {
-            return
+            return;
         }
         if (e.detail.value === 'none') {
-            this.curEdit.type = 'none'
+            this.curEdit.type = 'none';
         } else {
-            this.curEdit.type = e.detail.value
+            this.curEdit.type = e.detail.value;
         }
     }
 
     private selectedStatusChanged = (e: any): void => {
         if (!this.curEdit) {
-            return
+            return;
         }
-        let status = parseInt(e.detail.value)
-        if(isNaN(status)){
-            return
+        const status = parseInt(e.detail.value);
+        if(isNaN(status)) {
+            return;
         }
-        this.curEdit.status = status
+        this.curEdit.status = status;
     }
 
     private edit = (): void => {
         if (!this.curEdit) {
-            return
+            return;
         }
         if (this.titleElem && this.titleElem.value) {
-            this.curEdit.title = this.titleElem.value
+            this.curEdit.title = this.titleElem.value;
         }
         if (this.abstractElem && this.abstractElem.value) {
-            this.curEdit.abstract = this.abstractElem.value
+            this.curEdit.abstract = this.abstractElem.value;
         }
         if (this.doiElem && this.doiElem.value) {
-            this.curEdit.doi = this.doiElem.value
+            this.curEdit.doi = this.doiElem.value;
         }
         if (this.citedElem && this.citedElem.value) {
-            let cited = parseInt(this.citedElem.value)
-            if(!isNaN(cited)){
-                this.curEdit.cited_amount = cited
+            const cited = parseInt(this.citedElem.value);
+            if(!isNaN(cited)) {
+                this.curEdit.cited_amount = cited;
             }
         }
         if (this.yearElem && this.yearElem.value) {
-            let year = parseInt(this.yearElem.value)
-            if(!isNaN(year)){
-                this.curEdit.year = year
+            const year = parseInt(this.yearElem.value);
+            if(!isNaN(year)) {
+                this.curEdit.year = year;
             }
         }
         if (this.urlElem && this.urlElem.value) {
-
-            this.curEdit.url = this.urlElem.value
+            this.curEdit.url = this.urlElem.value;
         }
         if (this.journalElem && this.journalElem.value) {
-            this.curEdit.journal = this.journalElem.value
+            this.curEdit.journal = this.journalElem.value;
         }
         if (this.publisherElem && this.publisherElem.value) {
-            this.curEdit.publisher = this.publisherElem.value
+            this.curEdit.publisher = this.publisherElem.value;
         }
         if (this.authorsElem && this.authorsElem.value) {
-            this.curEdit.authors = this.authorsElem.value
+            this.curEdit.authors = this.authorsElem.value;
         }
         if (this.commentElem && this.commentElem.value) {
-            this.curEdit.comment = this.commentElem.value
+            this.curEdit.comment = this.commentElem.value;
         }
 
-        fetch(window.API_LINK + "/project/"+this.projectID+"/article/"+this.curEdit.id, {
+        fetch(window.API_LINK + '/project/'+this.projectID+'/article/'+this.curEdit.id, {
             method: 'PUT',
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache',
@@ -218,14 +218,14 @@ export class ArticleEdit extends LitElement {
             body: JSON.stringify(this.curEdit),
         }).then(async (resp) => {
             if (resp.status !== 200) {
-                const response = await resp.json()
+                const response = await resp.json();
                 if (response.detail) {
-                    showNotification(response.detail)
+                    showNotification(response.detail);
                 } else {
-                    showNotification("Unable to edit article")
+                    showNotification('Unable to edit article');
                 }
             } else {
-                showNotification('Successfully updated article')
+                showNotification('Successfully updated article');
                 const event: CustomEvent = new CustomEvent(`article-editted`, {
                     detail: {
                     },
@@ -234,7 +234,7 @@ export class ArticleEdit extends LitElement {
                 });
                 document.dispatchEvent(event);
             }
-        })
+        });
     }
 }
 
