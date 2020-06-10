@@ -37,7 +37,9 @@ export class Articles extends connect(window.store)(LitElement) {
             }
 
             .column{
+                word-wrap: break-word;
                 width: 150px;
+                min-width: 150px;
                 padding: 5px;
             }
 
@@ -46,7 +48,8 @@ export class Articles extends connect(window.store)(LitElement) {
             }
 
             .large{
-                width: 350px;;
+                width: 350px;
+                min-width: 350px;
             }
 
             .small{
@@ -97,7 +100,7 @@ export class Articles extends connect(window.store)(LitElement) {
 
             .articles-list-wrapper{
                 width: 100%;
-                max-height: 500px;
+                max-height: 450px;
                 overflow-y: auto;
             }
 
@@ -133,6 +136,10 @@ export class Articles extends connect(window.store)(LitElement) {
 
             .addWrapper{
                 padding: 25px;
+            }
+
+            .button-margin{
+                margin-left: 10px;
             }
 
         `;
@@ -291,9 +298,12 @@ export class Articles extends connect(window.store)(LitElement) {
         <lit-button @click="${(): void => {
             this.addArticlePopup();
         }}">Add Article</lit-button>
-        <lit-button @click="${(): void => {
+        <lit-button class="button-margin" @click="${(): void => {
             this.removeDuplicates();
         }}">Remove Duplicates</lit-button>
+         <lit-button class="button-margin" @click="${(): void => {
+             this.autoScreen();
+         }}">Auto Screen</lit-button>
         <div class="grow"></div>
         <div class="label">Displaying: ${this.amountOfArticles} articles</div>
     </div>
@@ -386,7 +396,7 @@ export class Articles extends connect(window.store)(LitElement) {
             <div class="project-row">
                 <div class="column large">${item.title}</div>
                 <div class="column">${this.citedToString(item.cited_amount)}</div>
-                <div class="column">${item.doi}</div>
+                <div class="column doi">${item.doi}</div>
                 <div class="column">${item.journal}</div>
                 <div class="column">${item.authors}</div>
                 <img class="edit-button" src="assets/icons/edit.svg" @click="${(): void => {
@@ -420,6 +430,10 @@ export class Articles extends connect(window.store)(LitElement) {
         if(this.screenElem) {
             this.screenElem.showPopup = true;
         }
+    }
+
+    private autoScreen() {
+        console.log('TODO IMPL');
     }
 
     private removeDuplicates() {
