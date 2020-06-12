@@ -382,7 +382,6 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.curEdit) {
             return html``;
         }
-        console.log('EDIT CHANGED',this.curEdit);
         return html`
             <lit-screen .projectID=${this.projectID} .curEdit=${this.curEdit}></lit-screen>
         `;
@@ -433,7 +432,26 @@ export class Articles extends connect(window.store)(LitElement) {
     }
 
     private autoScreen() {
-        console.log('TODO IMPL');
+        fetch(window.API_LINK + '/project/'+this.projectID+'/screen/auto', {
+            method: 'POST',
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache',
+            headers: window.STDHeaders,
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+        }).then(async (resp) => {
+            if (resp.status !== 200) {
+                const response = await resp.json();
+                if (response.detail) {
+                    showNotification(response.detail);
+                } else {
+                    showNotification('Unable to start automatic screening');
+                }
+            } else {
+                const response = await resp.json();
+                showNotification(response.message);
+            }
+        });
     }
 
     private removeDuplicates() {
