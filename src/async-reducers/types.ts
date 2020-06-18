@@ -63,14 +63,18 @@ export const ArticleStatusOptions: SelectOption[] = [
     },
     {
         value: '3',
-        text: 'Included',
+        text: 'IncludedAbstract',
     },
     {
         value: '4',
-        text: 'Unknown',
+        text: 'Included',
     },
     {
         value: '5',
         text: 'Duplicate',
+    },
+    {
+        value: '6',
+        text: 'Unknown',
     },
 ];
