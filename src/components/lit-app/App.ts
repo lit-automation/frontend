@@ -1,17 +1,18 @@
-import { css, CSSResult, customElement, html, property, TemplateResult, PropertyValues } from 'lit-element';
+import { css, CSSResult, customElement, html, property, PropertyValues, TemplateResult } from 'lit-element';
 import { connect, watch } from 'lit-redux-watch';
 import { AppBaseRoute, AppRoute } from '../lit-router/types';
 
-import { Router } from '../lit-router/Router';
 import '../../elements/Notification';
 import '../../elements/StyleProvider';
 import '../lit-create-signin/Signin';
 import '../lit-header/Header';
 import '../lit-menu/Menu';
-import '../lit-pages/Home';
 import '../lit-pages/Articles';
 import '../lit-pages/Graph';
+import '../lit-pages/Home';
 import '../lit-pages/Import';
+import '../lit-pages/ScreenAbstract';
+import { Router } from '../lit-router/Router';
 
 /**
  * App root component
@@ -39,9 +40,17 @@ export class App extends connect(window.store)(Router) {
                         path: '/import',
                         component: 'lit-import',
                     },
-                ]
+                    {
+                        path: '/screen-abstract',
+                        component: 'lit-screen-abstract',
+                    },
+                    {
+                        path: '/screen-full-text',
+                        component: 'lit-screen-abstract',
+                    },
+                ],
             },
-        ]
+        ];
     }
 
     static get styles(): CSSResult {
@@ -100,15 +109,15 @@ export class App extends connect(window.store)(Router) {
         `;
     }
 
-    @watch('signin.jwt')
-    private jwt?: string; 
-
     @property({ type: Boolean, reflect: true })
     public isAuthenticated: boolean = false;
 
+    @watch('signin.jwt')
+    private jwt?: string;
+
     constructor() {
         super();
-        let jwt = localStorage.getItem('jwt');
+        const jwt = localStorage.getItem('jwt');
         if (jwt) {
             this.jwt = jwt;
         }
@@ -131,7 +140,7 @@ export class App extends connect(window.store)(Router) {
                 </div>
            </div>
         </lit-style-provider>
-    `
+    `;
     }
 
     public async connectedCallback(): Promise<void> {
@@ -144,13 +153,13 @@ export class App extends connect(window.store)(Router) {
 
     protected shouldUpdate = (changedProperties: PropertyValues): boolean => {
         if (this.jwt) {
-            this.isAuthenticated = true
+            this.isAuthenticated = true;
         } else {
-            this.isAuthenticated = false
+            this.isAuthenticated = false;
         }
         return super.shouldUpdate(changedProperties);
     }
-    
+
     protected readonly updated = (changedProperties: PropertyValues): void => {
         super.updated(changedProperties);
     }

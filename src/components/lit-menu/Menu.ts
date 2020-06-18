@@ -1,6 +1,6 @@
 import { css, CSSResult, customElement, html, LitElement, TemplateResult } from 'lit-element';
-import { goToRoute } from '../lit-router/goToRoute';
 import { connect, watch } from 'lit-redux-watch';
+import { goToRoute } from '../lit-router/goToRoute';
 
 /**
  * Menu root component
@@ -41,34 +41,43 @@ export class Menu extends connect(window.store)(LitElement) {
     public render = (): TemplateResult => html`
         <div class="menu">
             <a class="menu-item" @click="${(): void => {
-            this.handleRouting('/');
-        }}">
+                this.handleRouting('/');
+            }}">
             Home
             </a>
             <a class="menu-item" @click="${(): void => {
-            this.handleRouting('/articles');
-        }}">
+                this.handleRouting('/articles');
+            }}">
             Articles
             </a>
             <a class="menu-item" @click="${(): void => {
-            this.handleRouting('/import');
-        }}">
+                this.handleRouting('/screen-abstract');
+            }}">
+            Screen abstracts
+            </a>
+            <!-- <a class="menu-item" @click="${(): void => {
+                this.handleRouting('/screen-full-text');
+            }}">
+            Screen full text
+            </a> -->
+            <a class="menu-item" @click="${(): void => {
+                this.handleRouting('/import');
+            }}">
             Import
             </a>
             <a class="menu-item" @click="${(): void => {
-            this.handleRouting('/graph');
-        }}">
+                this.handleRouting('/graph');
+            }}">
             Graph
             </a>
         </div>
-    `;
+    `
 
-    private handleRouting = (route: string): void =>{
-        if(this.retrievingSelectedProject || this.retrievingArticles){
-            return
+    private handleRouting = (route: string): void => {
+        if(this.retrievingSelectedProject || this.retrievingArticles) {
+            return;
         }
         goToRoute(route);
-
     }
 }
 

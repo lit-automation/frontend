@@ -46,6 +46,8 @@ export class ArticleEdit extends LitElement {
     private titleElem?: HTMLInputElement;
     @query('#abstract')
     private abstractElem?: HTMLInputElement;
+    @query('#fulltext')
+    private fullTextElem?: HTMLInputElement;
     @query('#doi')
     private doiElem?: HTMLInputElement;
     @query('#cited')
@@ -96,6 +98,10 @@ export class ArticleEdit extends LitElement {
             <div class="row">
                 <div class="label">Abstract</div>
                 <lit-input-field class="edit-item" textarea .value="${this.curEdit.abstract}" id="abstract" placeholder="Abstract"></lit-input-field>
+            </div>
+            <div class="row">
+                <div class="label">Full text</div>
+                <lit-input-field class="edit-item" textarea .value="${this.curEdit.full_text}" id="fulltext" placeholder="Full text"></lit-input-field>
             </div>
             <div class="row">
                 <div class="label">DOI</div>
@@ -176,6 +182,9 @@ export class ArticleEdit extends LitElement {
         }
         if (this.abstractElem && this.abstractElem.value) {
             this.curEdit.abstract = this.abstractElem.value;
+        }
+        if (this.fullTextElem && this.fullTextElem.value) {
+            this.curEdit.full_text = this.fullTextElem.value;
         }
         if (this.doiElem && this.doiElem.value) {
             this.curEdit.doi = this.doiElem.value;

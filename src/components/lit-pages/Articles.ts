@@ -2,12 +2,11 @@ import { css, CSSResult, customElement, html, LitElement, property, PropertyValu
 import { connect, watch } from 'lit-redux-watch';
 import { ArticleStatusOptions, ArticleTypeOptions, ProjArticle } from '../../async-reducers';
 import { getArticles, getProject } from '../../async-reducers';
-import '../../elements/Button';
 import { Button } from '../../elements/Button';
+import '../../elements/Button';
+import '../../elements/InputField';
 import { showNotification } from '../../elements/Notification';
 import { Popup } from '../../elements/Popup';
-
-import '../../elements/InputField';
 import '../../elements/Popup';
 import '../../elements/Select';
 import './ArticleEdit';
@@ -301,9 +300,7 @@ export class Articles extends connect(window.store)(LitElement) {
         <lit-button class="button-margin" @click="${(): void => {
             this.removeDuplicates();
         }}">Remove Duplicates</lit-button>
-         <lit-button class="button-margin" @click="${(): void => {
-             this.autoScreen();
-         }}">Auto Screen</lit-button>
+
         <div class="grow"></div>
         <div class="label">Displaying: ${this.amountOfArticles} articles</div>
     </div>
@@ -429,29 +426,6 @@ export class Articles extends connect(window.store)(LitElement) {
         if(this.screenElem) {
             this.screenElem.showPopup = true;
         }
-    }
-
-    private autoScreen() {
-        fetch(window.API_LINK + '/project/'+this.projectID+'/screen/auto', {
-            method: 'POST',
-            mode: 'cors', // no-cors, *cors, same-origin
-            cache: 'no-cache',
-            headers: window.STDHeaders,
-            redirect: 'follow', // manual, *follow, error
-            referrerPolicy: 'no-referrer', // no-referrer, *client
-        }).then(async (resp) => {
-            if (resp.status !== 200) {
-                const response = await resp.json();
-                if (response.detail) {
-                    showNotification(response.detail);
-                } else {
-                    showNotification('Unable to start automatic screening');
-                }
-            } else {
-                const response = await resp.json();
-                showNotification(response.message);
-            }
-        });
     }
 
     private removeDuplicates() {

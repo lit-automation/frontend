@@ -70,9 +70,6 @@ export class ArticleScreen extends LitElement {
     @property({ type: Object, reflect: true })
     public curEdit?: ProjArticle;
 
-    // @property({ type: Object, reflect: true })
-    // public artTitle?: ScreenData;
-
     @property({ type: Object, reflect: true })
     public tfIDF?: ScreenDataAbstractTitle;
 
@@ -270,7 +267,7 @@ export class ArticleScreen extends LitElement {
                     showNotification('Unable to set screening inclusion/exclusion for article');
                 }
             } else {
-                showNotification('Adjusted article');
+                showNotification('Trained model with article');
                 const event: CustomEvent = new CustomEvent(`article-screened`, {
                     detail: {
                     },

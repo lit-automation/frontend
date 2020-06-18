@@ -11,6 +11,7 @@ export type Project = {
 
 export type ProjArticle = {
     abstract: string;
+    full_text: string;
     authors: string;
     cited_amount: number;
     comment: string;
