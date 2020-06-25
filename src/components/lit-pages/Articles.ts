@@ -308,7 +308,9 @@ export class Articles extends connect(window.store)(LitElement) {
         <lit-button class="button-margin" @click="${(): void => {
             this.removeDuplicates();
         }}">Remove Duplicates</lit-button>
-
+        <lit-button class="button-margin" @click="${(): void => {
+            this.screeningExplanation();
+        }}">Screening Explanation</lit-button>
         <div class="grow"></div>
         <div class="label">Displaying: ${this.amountOfArticles} articles</div>
     </div>
@@ -335,7 +337,6 @@ export class Articles extends connect(window.store)(LitElement) {
             <div class="articles-list-wrapper">
                 ${this.renderArticles()}
             </div>
-
             <div class="navigation">
                 <lit-button @click="${(): void => {
                     this.downloadArticles();
@@ -536,6 +537,15 @@ export class Articles extends connect(window.store)(LitElement) {
         } else {
             window.open(item.url, '_blank');
         }
+    }
+    private screeningExplanation = () => {
+        const event: CustomEvent = new CustomEvent(`screening-explanation`, {
+            detail: {
+            },
+            bubbles: true,
+            composed: true,
+        });
+        document.dispatchEvent(event);
     }
 
     private articleScreened = (): void => {

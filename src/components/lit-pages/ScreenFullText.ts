@@ -121,6 +121,11 @@ export class screenAbstract extends connect(window.store)(LitElement) {
 
     <div class="container">
         <div class="row">
+            <lit-button class="button-margin" @click="${(): void => {
+                this.screeningExplanation();
+            }}">Screening Explanation</lit-button>
+        </div>
+        <div class="row">
             <div class="row">
                 <div class="header">
                 Project:
@@ -167,6 +172,16 @@ export class screenAbstract extends connect(window.store)(LitElement) {
             this.retrieveScreeningInfo();
         }
         super.update(changedProperties);
+    }
+
+    private screeningExplanation = () => {
+        const event: CustomEvent = new CustomEvent(`screening-explanation`, {
+            detail: {
+            },
+            bubbles: true,
+            composed: true,
+        });
+        document.dispatchEvent(event);
     }
 
     private createModelDetails = (data?: any): TemplateResult => {

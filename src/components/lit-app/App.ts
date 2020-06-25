@@ -1,8 +1,9 @@
-import { css, CSSResult, customElement, html, property, PropertyValues, TemplateResult } from 'lit-element';
+import { css,CSSResult, customElement, html, property, PropertyValues, query, TemplateResult } from 'lit-element';
 import { connect, watch } from 'lit-redux-watch';
 import { AppBaseRoute, AppRoute } from '../lit-router/types';
 
 import '../../elements/Notification';
+import { Popup } from '../../elements/Popup';
 import '../../elements/StyleProvider';
 import '../lit-create-signin/Signin';
 import '../lit-header/Header';
@@ -13,6 +14,8 @@ import '../lit-pages/Home';
 import '../lit-pages/Import';
 import '../lit-pages/ScreenAbstract';
 import '../lit-pages/ScreenFullText';
+import '../lit-pages/ScreeningExplanation';
+
 import { Router } from '../lit-router/Router';
 
 /**
@@ -116,17 +119,27 @@ export class App extends connect(window.store)(Router) {
     @watch('signin.jwt')
     private jwt?: string;
 
+    @query('#screenExplanationPopup')
+    private popupElem?: Popup;
+
     constructor() {
         super();
         const jwt = localStorage.getItem('jwt');
         if (jwt) {
             this.jwt = jwt;
         }
+        document.addEventListener('screening-explanation', this.openScreeningExplanation);
     }
 
     public render = (): TemplateResult => {
         return html`
         <lit-style-provider>
+            <lit-popup id="screenExplanationPopup" >
+                <div>
+                    <lit-screening-explanation></lit-screening-explanation>
+                </div>
+            </lit-popup>
+
             <lit-notification></lit-notification>
             <lit-header ?auth="${this.isAuthenticated}" class="header"></lit-header>
             <div class="login-wrapper">
@@ -163,6 +176,13 @@ export class App extends connect(window.store)(Router) {
 
     protected readonly updated = (changedProperties: PropertyValues): void => {
         super.updated(changedProperties);
+    }
+
+    private openScreeningExplanation = (e: any): void => {
+        console.log(e);
+        if (this.popupElem) {
+            this.popupElem.showPopup = true;
+        }
     }
 }
 
