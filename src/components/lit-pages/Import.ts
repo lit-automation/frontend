@@ -108,7 +108,18 @@ export class Import extends connect(window.store)(LitElement) {
         <div class="exp-text">
         Use this form to create a project from an existing CSV file.
         The first row of your CSV should be indicating the column headers.
-        Valid headers are: "title","abstract","full_text","doi","url","year" & "status".
+        Valid headers are: "title", "abstract", "full_text", "doi", "url", "year" & "status".
+        <div>
+        </div>
+        Status is indicated by a number:
+        <ul>
+            <li>"Unprocessed" = 1</li>
+            <li>"Excluded" = 2</li>
+            <li>"Included on Abstract" = 3</li>
+            <li>"Included" = 4</li>
+            <li>"Duplicate" = 5</li>
+            <li>"Unknown" = 6</li>
+        </ul>
         </div>
         </div>
        </div>
