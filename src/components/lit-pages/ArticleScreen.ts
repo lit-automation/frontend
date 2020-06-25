@@ -78,6 +78,9 @@ export class ArticleScreen extends LitElement {
 
     public prevID: string = '';
 
+    @property({ type: Boolean, reflect: true })
+    private screenAbstract?: boolean;
+
     public render = (): TemplateResult => {
         return html`
 
@@ -103,7 +106,7 @@ export class ArticleScreen extends LitElement {
     }
 
     protected readonly update = (changedProperties: PropertyValues): void => {
-        if(this.curEdit) {
+        if(this.curEdit && this.screenAbstract !== undefined) {
             if(this.prevID !== this.curEdit.id) {
                 this.prevID = this.curEdit.id;
                 this.retrieveScreeningInfo();
@@ -188,7 +191,13 @@ export class ArticleScreen extends LitElement {
         if (!this.projectID) {
             return;
         }
-        fetch(window.API_LINK + '/project/' + this.projectID + '/screen/' + this.curEdit.id, {
+
+        let additional = '?screen_type=abstract';
+        if(!this.screenAbstract) {
+            additional = '?screen_type=fulltext';
+        }
+
+        fetch(window.API_LINK + '/project/' + this.projectID + '/screen/' + this.curEdit.id+additional, {
             method: 'GET',
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache',
@@ -228,10 +237,6 @@ export class ArticleScreen extends LitElement {
         return x;
     }
 
-    // private screenDataConverter = (x: any): ScreenData => {
-    //     return x;
-    // }
-
     private include = (): void => {
         this.screen(true);
     }
@@ -247,10 +252,14 @@ export class ArticleScreen extends LitElement {
         if (!this.projectID) {
             return;
         }
+        let additional = '?screen_type=abstract';
+        if(!this.screenAbstract) {
+            additional = '?screen_type=fulltext';
+        }
         const body = {
             include: include,
         };
-        fetch(window.API_LINK + '/project/' + this.projectID + '/screen/' + this.curEdit.id, {
+        fetch(window.API_LINK + '/project/' + this.projectID + '/screen/' + this.curEdit.id+additional, {
             method: 'PUT',
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache',

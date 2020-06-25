@@ -55,11 +55,11 @@ export class Menu extends connect(window.store)(LitElement) {
             }}">
             Screen abstracts
             </a>
-            <!-- <a class="menu-item" @click="${(): void => {
+            <a class="menu-item" @click="${(): void => {
                 this.handleRouting('/screen-full-text');
             }}">
             Screen full text
-            </a> -->
+            </a>
             <a class="menu-item" @click="${(): void => {
                 this.handleRouting('/import');
             }}">

@@ -17,10 +17,10 @@ type ScreenDataAbstractTitle = {
     abstract: string;
 };
 /**
- * ScreenAbstract root component
+ * screenAbstract root component
  */
-@customElement('lit-screen-abstract')
-export class ScreenAbstract extends connect(window.store)(LitElement) {
+@customElement('lit-screen-full-text')
+export class screenAbstract extends connect(window.store)(LitElement) {
     static get styles(): CSSResult {
         return css`
             :host {
@@ -111,7 +111,7 @@ export class ScreenAbstract extends connect(window.store)(LitElement) {
     private modelDetails?: any;
 
     @property({ type: Boolean, reflect: true })
-    private screenAbstract: boolean = true;
+    private screenAbstract: boolean = false;
 
     constructor() {
         super();
@@ -232,6 +232,7 @@ export class ScreenAbstract extends connect(window.store)(LitElement) {
         if(!this.screenAbstract) {
             additional = 'fulltext';
         }
+        console.log('Retrieving');
         this.isLoading = true;
         fetch(window.API_LINK + '/project/' + this.projectID + '/screen/activelearning/'+additional, {
             method: 'GET',
@@ -332,7 +333,6 @@ export class ScreenAbstract extends connect(window.store)(LitElement) {
         const body = {
             include: include,
         };
-
         let additional = '?screen_type=abstract';
         if(!this.screenAbstract) {
             additional = '?screen_type=fulltext';
@@ -393,6 +393,6 @@ export class ScreenAbstract extends connect(window.store)(LitElement) {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'lit-screen-abstract': ScreenAbstract;
+        'lit-screen-full-text': screenAbstract;
     }
 }

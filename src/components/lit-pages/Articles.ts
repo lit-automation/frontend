@@ -130,7 +130,6 @@ export class Articles extends connect(window.store)(LitElement) {
                 width: 24px;
                 height: auto;
                 margin-left: 10px;
-
             }
 
             .addWrapper{
@@ -207,6 +206,9 @@ export class Articles extends connect(window.store)(LitElement) {
     @query('#screenPopup')
     private screenElem?: Popup;
 
+    @query('#screenFullPopup')
+    private screenFullElem?: Popup;
+
     @property({ type: Object, reflect: true })
     private curEdit?: ProjArticle;
 
@@ -228,6 +230,12 @@ export class Articles extends connect(window.store)(LitElement) {
     <lit-popup id="screenPopup" >
     <div>
         ${this.renderScreen()}
+    </div>
+    </lit-popup>
+
+    <lit-popup id="screenFullPopup" >
+    <div>
+        ${this.renderScreenFull()}
     </div>
     </lit-popup>
 
@@ -377,10 +385,23 @@ export class Articles extends connect(window.store)(LitElement) {
 
     private renderScreen() {
         if (!this.curEdit) {
-            return html``;
+            return html`
+            <lit-screen .screenAbstract=${true}></lit-screen>
+            `;
         }
         return html`
             <lit-screen .projectID=${this.projectID} .curEdit=${this.curEdit}></lit-screen>
+        `;
+    }
+
+    private renderScreenFull() {
+        if (!this.curEdit) {
+            return html`
+            <lit-screen .screenAbstract=${false}></lit-screen>
+            `;
+        }
+        return html`
+            <lit-screen .projectID=${this.projectID} .screenAbstract=${false} .curEdit=${this.curEdit}></lit-screen>
         `;
     }
 
@@ -388,7 +409,8 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.articles) {
             return html``;
         }
-        return this.articles.map((item): TemplateResult => {return html`
+        return this.articles.map((item): TemplateResult => {
+            return html`
             <div class="project-row">
                 <div class="column large">${item.title}</div>
                 <div class="column">${this.citedToString(item.cited_amount)}</div>
@@ -401,11 +423,15 @@ export class Articles extends connect(window.store)(LitElement) {
             <img class="edit-button" src="assets/icons/screen.svg" @click="${(): void => {
                 this.screenArticlePopup(item);
             }}"/>
+            <img class="edit-button" src="assets/icons/fulltext-screen-icon.svg" @click="${(): void => {
+                this.screenArticleFullPopup(item);
+            }}"/>
             <img class="edit-button" id="globe" src="assets/icons/globe.svg" @click="${(): void => {
                 this.goToHref(item);
             }}"/>
             </div>
-            `;});
+            `;
+        });
     }
 
     private articleDetails(item: ProjArticle) {
@@ -423,13 +449,20 @@ export class Articles extends connect(window.store)(LitElement) {
 
     private screenArticlePopup(item: ProjArticle) {
         this.curEdit = item;
-        if(this.screenElem) {
+        if (this.screenElem) {
             this.screenElem.showPopup = true;
         }
     }
 
+    private screenArticleFullPopup(item: ProjArticle) {
+        this.curEdit = item;
+        if (this.screenFullElem) {
+            this.screenFullElem.showPopup = true;
+        }
+    }
+
     private removeDuplicates() {
-        fetch(window.API_LINK + '/project/'+this.projectID+'/removeduplicates', {
+        fetch(window.API_LINK + '/project/' + this.projectID + '/removeduplicates', {
             method: 'POST',
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache',
@@ -463,10 +496,10 @@ export class Articles extends connect(window.store)(LitElement) {
             res.doi = this.addDOIElem.value;
         }
 
-        if(res.title === '' && res.doi === '') {
+        if (res.title === '' && res.doi === '') {
             showNotification('Atleast title or DOI need to be filled in.');
         }
-        fetch(window.API_LINK + '/project/'+this.projectID+'/article', {
+        fetch(window.API_LINK + '/project/' + this.projectID + '/article', {
             method: 'POST',
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache',
@@ -509,10 +542,13 @@ export class Articles extends connect(window.store)(LitElement) {
         if (this.screenElem) {
             this.screenElem.showPopup = false;
         }
+        if(this.screenFullElem) {
+            this.screenFullElem.showPopup = false;
+        }
         if (!this.projectID) {
             return;
         }
-        if(!this.curEdit) {
+        if (!this.curEdit) {
             return;
         }
         this.curEdit = undefined;
@@ -527,7 +563,7 @@ export class Articles extends connect(window.store)(LitElement) {
         if (!this.projectID) {
             return;
         }
-        if(!this.curEdit) {
+        if (!this.curEdit) {
             return;
         }
         this.curEdit = undefined;

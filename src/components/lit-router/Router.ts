@@ -1,4 +1,4 @@
-import { LitElement, property, PropertyValues ,query} from 'lit-element';
+import { LitElement, property, PropertyValues ,query } from 'lit-element';
 import { connect, watch } from 'lit-redux-watch';
 import { setAppRouter } from '../../actions/app';
 
@@ -38,7 +38,6 @@ export class Router extends connect(window.store)(LitElement) {
         window.addEventListener('vaadin-router-location-changed', this.routerLocationChanged as EventListener);
     }
 
-    
     protected firstUpdated(changedProperties: PropertyValues): void {
         super.firstUpdated(changedProperties);
         this.initRouter((<{constructor: {routes: AppBaseRoute[] | AppRoute[] }}><unknown>this).constructor.routes);

@@ -12,6 +12,7 @@ import '../lit-pages/Graph';
 import '../lit-pages/Home';
 import '../lit-pages/Import';
 import '../lit-pages/ScreenAbstract';
+import '../lit-pages/ScreenFullText';
 import { Router } from '../lit-router/Router';
 
 /**
@@ -46,7 +47,7 @@ export class App extends connect(window.store)(Router) {
                     },
                     {
                         path: '/screen-full-text',
-                        component: 'lit-screen-abstract',
+                        component: 'lit-screen-full-text',
                     },
                 ],
             },
