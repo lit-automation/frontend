@@ -212,6 +212,9 @@ export class Articles extends connect(window.store)(LitElement) {
     @property({ type: Object, reflect: true })
     private curEdit?: ProjArticle;
 
+    private screenAbstract: boolean = false;
+    private screenFull: boolean = false;
+
     constructor() {
         super();
         document.addEventListener('type-changed', this.selectedTypeChanged);
@@ -385,18 +388,18 @@ export class Articles extends connect(window.store)(LitElement) {
     }
 
     private renderScreen() {
-        if (!this.curEdit) {
+        if (!this.curEdit || !this.screenAbstract) {
             return html`
             <lit-screen .screenAbstract=${true}></lit-screen>
             `;
         }
         return html`
-            <lit-screen .projectID=${this.projectID} .curEdit=${this.curEdit}></lit-screen>
+            <lit-screen .screenAbstract=${true} .projectID=${this.projectID} .curEdit=${this.curEdit}></lit-screen>
         `;
     }
 
     private renderScreenFull() {
-        if (!this.curEdit) {
+        if (!this.curEdit|| !this.screenFull) {
             return html`
             <lit-screen .screenAbstract=${false}></lit-screen>
             `;
@@ -449,6 +452,7 @@ export class Articles extends connect(window.store)(LitElement) {
     }
 
     private screenArticlePopup(item: ProjArticle) {
+        this.screenAbstract = true;
         this.curEdit = item;
         if (this.screenElem) {
             this.screenElem.showPopup = true;
@@ -456,6 +460,7 @@ export class Articles extends connect(window.store)(LitElement) {
     }
 
     private screenArticleFullPopup(item: ProjArticle) {
+        this.screenFull = true;
         this.curEdit = item;
         if (this.screenFullElem) {
             this.screenFullElem.showPopup = true;
@@ -555,6 +560,8 @@ export class Articles extends connect(window.store)(LitElement) {
         if(this.screenFullElem) {
             this.screenFullElem.showPopup = false;
         }
+        this.screenAbstract = false;
+        this.screenFull = false;
         if (!this.projectID) {
             return;
         }
